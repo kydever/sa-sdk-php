@@ -18,7 +18,7 @@ class Http
     /**
      * @param int $timeout 超时时间 秒
      */
-    public static function create(string $baseUri, int $timeout = 2): Client
+    public static function create(?string $baseUri = null, int $timeout = 2): Client
     {
         return new Client([
             'base_uri' => $baseUri,

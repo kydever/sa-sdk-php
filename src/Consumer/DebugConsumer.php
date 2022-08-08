@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace KY\SA\Consumer;
 
+use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use KY\SA\Exception\SensorsAnalyticsDebugException;
 use KY\SA\Http;
@@ -32,11 +33,13 @@ class DebugConsumer implements ConsumerInterface
         if (! $baseUri) {
             throw new SensorsAnalyticsDebugException('The baseUri cannot be empty.');
         }
+
+        $this->baseUri = (string) (new Uri($this->baseUri))->withPath('/debug');
     }
 
     public function send(string $msg): bool
     {
-        $client = Http::create($this->baseUri, $this->timeout);
+        $client = Http::create(timeout: $this->timeout);
         $options = [
             RequestOptions::FORM_PARAMS => [
                 'data_list' => Packer::pack([$msg]),
@@ -49,7 +52,7 @@ class DebugConsumer implements ConsumerInterface
                 'Dry-Run' => 'true',
             ];
         }
-        $response = $client->post('/debug', $options);
+        $response = $client->post($this->baseUri, $options);
         if ($response->getStatusCode() !== 200) {
             throw new SensorsAnalyticsDebugException((string) $response->getBody(), $response->getStatusCode());
         }
