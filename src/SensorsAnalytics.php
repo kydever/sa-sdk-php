@@ -9,16 +9,8 @@ declare(strict_types=1);
  * @contact  l@hyperf.io
  * @license  https://github.com/kydever/sa-sdk-php/blob/main/LICENSE
  */
-namespace HyperfTest\Cases;
+namespace KY\SA;
 
-/**
- * @internal
- * @coversNothing
- */
-class ExampleTest extends AbstractTestCase
+class SensorsAnalytics
 {
-    public function testExample()
-    {
-        $this->assertTrue(true);
-    }
 }

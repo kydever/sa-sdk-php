@@ -9,16 +9,14 @@ declare(strict_types=1);
  * @contact  l@hyperf.io
  * @license  https://github.com/kydever/sa-sdk-php/blob/main/LICENSE
  */
-namespace HyperfTest\Cases;
+namespace HyperfTest\Cases\Consumer;
+
+use HyperfTest\Cases\AbstractTestCase;
 
 /**
  * @internal
  * @coversNothing
  */
-class ExampleTest extends AbstractTestCase
+class DebugConsumerTest extends AbstractTestCase
 {
-    public function testExample()
-    {
-        $this->assertTrue(true);
-    }
 }
