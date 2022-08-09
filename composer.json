@@ -30,6 +30,7 @@
         "swoole/ide-helper": "^5.0"
     },
     "suggest": {
+        "ext-redis": "Required to use RedisConsumer.",
         "swow/swow": "Required to create swow components."
     },
     "minimum-stability": "dev",
