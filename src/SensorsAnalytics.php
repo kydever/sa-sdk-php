@@ -15,7 +15,7 @@ use KY\SA\Consumer\ConsumerInterface;
 use KY\SA\Event\Event;
 use KY\SA\Event\TrackEvent;
 
-class SensorsAnalytics
+class SensorsAnalytics implements SensorsAnalyticsInterface
 {
     protected array $defaultProperties = [
         '$lib' => 'php',
@@ -33,14 +33,8 @@ class SensorsAnalytics
 
     /**
      * 跟踪一个用户的行为。
-     *
-     * @param string $distinctId 用户的唯一标识
-     * @param bool $isLoginId 用户标识是否是登录 ID，false 表示该标识是一个匿名 ID
-     * @param string $eventName 事件名称
-     * @param array $properties 事件的属性
-     * @return bool
      */
-    public function track(TrackEvent $event)
+    public function track(TrackEvent $event): bool
     {
         $event->properties = array_merge($this->defaultProperties, $event->properties);
 
