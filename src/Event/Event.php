@@ -42,8 +42,9 @@ class Event implements \JsonSerializable
             throw new SensorsAnalyticsIllegalDataException('distinct_id is invalid.');
         }
 
-        $this->assertKeyWithRegex();
+        $this->assertKeyWithRegex($this->name);
         $this->assertProperties();
+        $this->assertIdentities();
 
         $eventTime = $this->getEventTime($isWindows);
 
@@ -76,13 +77,6 @@ class Event implements \JsonSerializable
 
         $this->data = $data;
         return $this;
-        // if (isset($data['identities'])) {
-        //     if (is_array($data['identities'])) {
-        //         $this->_assert_identities($data['type'], $data['identities']);
-        //     } else {
-        //         throw new SensorsAnalyticsIllegalDataException("identities must be an array.");
-        //     }
-        // }
     }
 
     public function getEventTime(bool $isWindows = false): int|string
@@ -116,9 +110,8 @@ class Event implements \JsonSerializable
         return array_merge($result, $this->libProperties);
     }
 
-    private function assertKeyWithRegex()
+    private function assertKeyWithRegex(string $key)
     {
-        $key = $this->name;
         $pattern = '/^((?!^distinct_id$|^original_id$|^time$|^properties$|^id$|^first_id$|^second_id$|^users$|^events$|^event$|^user_id$|^date$|^datetime$|^user_group|^user_tag)[a-zA-Z_$][a-zA-Z\\d_$]{0,99})$/i';
         if (! preg_match($pattern, $key)) {
             throw new SensorsAnalyticsIllegalDataException("key must be a valid variable key. [key='{$key}']");
@@ -170,6 +163,16 @@ class Event implements \JsonSerializable
                         throw new SensorsAnalyticsIllegalDataException("[list] property's value must be a str. [value='{$lvalue}']");
                     }
                 }
+            }
+        }
+    }
+
+    private function assertIdentities()
+    {
+        foreach ($this->identities as $key => $value) {
+            $this->assertKeyWithRegex($key);
+            if (! $value || strlen($key) > 255) {
+                throw new SensorsAnalyticsIllegalDataException(sprintf('the value %s is too long, max length is 255.', $value));
             }
         }
     }
