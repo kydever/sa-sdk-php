@@ -81,6 +81,10 @@ class RedisConsumer implements ConsumerInterface
         }
 
         $list = $this->getList();
+
+        // 刷新最后发送时间
+        $this->timestamp = time();
+
         if (! $list) {
             return false;
         }
