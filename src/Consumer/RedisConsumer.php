@@ -26,9 +26,14 @@ class RedisConsumer implements ConsumerInterface
     protected int $timeout = 10;
 
     /**
-     * @var int 队列长度
+     * @var int 最大队列长度
      */
-    protected int $length = 50;
+    protected int $maxSize = 50;
+
+    /**
+     * @var int 最小队列长度
+     */
+    protected int $minSize = 2;
 
     /**
      * @var int 最大投递间隔
@@ -52,9 +57,9 @@ class RedisConsumer implements ConsumerInterface
     {
         $length = $this->redis->rPush($this->listKey(), $msg);
 
-        if ($length > $this->length) {
+        if ($length >= $this->maxSize) {
             $this->flush();
-        } elseif ($this->timestamp + $this->interval < time()) {
+        } elseif ($length >= $this->minSize && $this->timestamp + $this->interval < time()) {
             $this->flush();
         }
 
@@ -64,8 +69,8 @@ class RedisConsumer implements ConsumerInterface
     public function getList(): array
     {
         $this->redis->pipeline();
-        $this->redis->lRange($this->lockKey(), 0, $this->length - 1);
-        $this->redis->lTrim($this->lockKey(), $this->length, -1);
+        $this->redis->lRange($this->lockKey(), 0, $this->maxSize - 1);
+        $this->redis->lTrim($this->lockKey(), $this->maxSize, -1);
         [$list, $ret] = $this->redis->exec();
         if (! $ret) {
             throw new SensorsAnalyticsException('Remove list from redis failed.');
