@@ -47,7 +47,7 @@ class SensorsAnalytics
         return $this->trackEvent($event);
     }
 
-    public function trackEvent(Event $event): bool
+    protected function trackEvent(Event $event): bool
     {
         return $this->consumer->send(Json::encode($event->build($this->project, $this->isWindows)));
     }
