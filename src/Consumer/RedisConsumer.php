@@ -68,9 +68,10 @@ class RedisConsumer implements ConsumerInterface
 
     public function getList(): array
     {
+        $length = max($this->maxSize - 1, 5);
         $this->redis->pipeline();
-        $this->redis->lRange($this->lockKey(), 0, $this->maxSize - 1);
-        $this->redis->lTrim($this->lockKey(), $this->maxSize, -1);
+        $this->redis->lRange($this->listKey(), 0, $length - 1);
+        $this->redis->lTrim($this->listKey(), $length, -1);
         [$list, $ret] = $this->redis->exec();
         if (! $ret) {
             throw new SensorsAnalyticsException('Remove list from redis failed.');
