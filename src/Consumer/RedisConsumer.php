@@ -81,6 +81,9 @@ class RedisConsumer implements ConsumerInterface
         }
 
         $list = $this->getList();
+        if (! $list) {
+            return false;
+        }
 
         try {
             $client = Http::create(timeout: $this->timeout);
