@@ -1,5 +1,7 @@
-# component-creator
+# 神策PHP SDK
+
+## 安装
 
 ```
-composer create-project hyperf/component-creator
+composer require kydev/sa-sdk-php
 ```
