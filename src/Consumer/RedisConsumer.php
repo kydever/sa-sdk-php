@@ -116,14 +116,21 @@ class RedisConsumer implements ConsumerInterface
             if ($code !== 200) {
                 throw new SensorsAnalyticsDebugException($body, $code);
             }
-        } finally {
-            $this->redis->del($this->lockKey());
             $log = [
-                'options' => $options ?? null,
-                'code' => $code ?? null,
-                'body' => $body ?? null,
+                'list' => $list,
+                'code' => $code,
+                'body' => $body,
             ];
             $this->logger?->info('flush: ' . Json::encode($log));
+        } catch (\Throwable $exception) {
+            $log = [
+                'list' => $list,
+                'exception' => (string) $exception,
+            ];
+            $this->logger?->info('flush: ' . Json::encode($log));
+            throw $exception;
+        } finally {
+            $this->redis->del($this->lockKey());
         }
 
         return true;
