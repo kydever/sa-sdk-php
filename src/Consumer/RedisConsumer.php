@@ -15,7 +15,9 @@ use GuzzleHttp\RequestOptions;
 use KY\SA\Exception\SensorsAnalyticsDebugException;
 use KY\SA\Exception\SensorsAnalyticsException;
 use KY\SA\Http;
+use KY\SA\Json;
 use KY\SA\Packer;
+use Psr\Log\LoggerInterface;
 use Redis;
 
 class RedisConsumer implements ConsumerInterface
@@ -48,8 +50,12 @@ class RedisConsumer implements ConsumerInterface
     /**
      * @param Redis $redis
      */
-    public function __construct(protected string $baseUri, protected mixed $redis, protected string $prefix = '{sa:msg}:')
-    {
+    public function __construct(
+        protected string $baseUri,
+        protected mixed $redis,
+        protected string $prefix = '{sa:msg}:',
+        protected ?LoggerInterface $logger = null
+    ) {
         $this->timestamp = time();
     }
 
@@ -105,11 +111,19 @@ class RedisConsumer implements ConsumerInterface
                 RequestOptions::VERIFY => false,
             ];
             $response = $client->post($this->baseUri, $options);
-            if ($response->getStatusCode() !== 200) {
-                throw new SensorsAnalyticsDebugException((string) $response->getBody(), $response->getStatusCode());
+            $code = $response->getStatusCode();
+            $body = (string) $response->getBody();
+            if ($code !== 200) {
+                throw new SensorsAnalyticsDebugException($body, $code);
             }
         } finally {
             $this->redis->del($this->lockKey());
+            $log = [
+                'options' => $options ?? null,
+                'code' => $code ?? null,
+                'body' => $body ?? null,
+            ];
+            $this->logger?->info('flush: ' . Json::encode($log));
         }
 
         return true;
